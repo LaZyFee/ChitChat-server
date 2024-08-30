@@ -3,11 +3,10 @@ const express = require("express");
 const http = require("http");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
-const path = require("path");
 const cookieParser = require("cookie-parser");
 const moment = require("moment");
 const cors = require("cors");
-
+const bodyParser = require('body-parser');
 
 
 
@@ -28,8 +27,8 @@ const io = require("socket.io")(server);
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
 global.io = io;

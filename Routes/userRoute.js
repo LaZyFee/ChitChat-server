@@ -21,4 +21,5 @@ router.get("/logout", logoutController);
 
 
 
-momdule.exports = router
+
+module.exports = router

@@ -2,7 +2,7 @@ const User = require("../Models/Users");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-async function signUp(req, res) {
+const signUp = async (req, res) => {
     try {
         const { name, email, mobile, password, image } = req.body;
 
@@ -22,7 +22,7 @@ async function signUp(req, res) {
             }
         }
 
-        const hashedPassword = await bcrypt.hash(password, 6);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Prepare the user object
         const user = new User({
@@ -49,13 +49,18 @@ async function signUp(req, res) {
         // Respond with success message and token
         res.status(201).json({
             message: "User created successfully",
-            token
+            token,
+            user: {
+                name: user.name,
+                profilePicture: user.profilePicture ? `data:${user.profilePicture.contentType};base64,${user.profilePicture.data.toString('base64')}` : null,
+            },
         });
     }
     catch (err) {
         res.status(500).json({ error: err.message });
     }
-}
+};
+
 
 module.exports = {
     signUp,

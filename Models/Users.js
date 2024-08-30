@@ -22,8 +22,9 @@ const userModel = mongoose.Schema(
             type: String,
             required: true,
         },
-        avatar: {
-            type: String,
+        profilePicture: {
+            data: Buffer,
+            contentType: String,
         },
         role: {
             type: String,
