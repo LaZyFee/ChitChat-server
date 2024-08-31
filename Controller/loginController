@@ -1,3 +1,4 @@
+// Controller/loginController.js
 const User = require('../Models/Users');
 const jwt = require('jsonwebtoken');
 
@@ -22,7 +23,8 @@ const login = async (req, res) => {
         );
 
         res.json({
-            message: "Login successful", token,
+            message: "Login successful",
+            token,
             user: {
                 name: user.name,
                 profilePicture: user.profilePicture ? `data:${user.profilePicture.contentType};base64,${user.profilePicture.data.toString('base64')}` : null,
@@ -32,7 +34,6 @@ const login = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
-
 
 module.exports = {
     login,

@@ -1,3 +1,4 @@
+// Controller/signupController.js
 const User = require("../Models/Users");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -60,7 +61,6 @@ const signUp = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
-
 
 module.exports = {
     signUp,

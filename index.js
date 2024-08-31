@@ -1,4 +1,4 @@
-//external imports
+// index.js
 const express = require("express");
 const http = require("http");
 const dotenv = require("dotenv");
@@ -8,16 +8,8 @@ const moment = require("moment");
 const cors = require("cors");
 const bodyParser = require('body-parser');
 
-
-
-//internal imports
-const signUpRouter = require("./Routes/signupRoute");
-const loginRouter = require("./Routes/loginRoute");
-
-
-
-
-
+// Internal imports
+const userRoute = require("./Routes/userRoute");
 
 dotenv.config();
 
@@ -35,10 +27,7 @@ global.io = io;
 app.locals.moment = moment;
 
 // Database connection
-//mongoDB atlas
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.9e7m0jr.mongodb.net/ChitChat?retryWrites=true&w=majority&appName=Cluster0`;
-//local mongoDB Compass
-// const uri = process.env.MONGO_CONNECTION_STRING;
 
 const connectDB = async () => {
     try {
@@ -51,14 +40,9 @@ const connectDB = async () => {
 
 connectDB();
 
-
-
-
-
-app.use("/signup", signUpRouter);
-app.use("/login", loginRouter);
-
-
+app.use("/signup", userRoute);
+app.use("/login", userRoute);
+app.use('/', userRoute);
 
 server.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);

@@ -1,25 +1,14 @@
+// Routes/userRoute.js
 const express = require("express");
 const router = express.Router();
-const User = require("../Models/User");
-
-
 
 const signupController = require("../Controller/signupController");
 const loginController = require("../Controller/loginController");
-const logoutController = require("../Controller/logoutController");
+const { protect } = require("../Middlewares/authenticateToken");
+const { allUsers } = require("../Controller/userController");
 
+router.post("/signup", signupController.signUp); // Use signUp as a method from signupController
+router.post("/login", loginController.login);    // Use login as a method from loginController
+router.get("/users", protect, allUsers);
 
-
-
-router.post("/signup", signupController);
-router.post("/login", loginController);
-router.get("/logout", logoutController);
-
-
-
-
-
-
-
-
-module.exports = router
+module.exports = router;
