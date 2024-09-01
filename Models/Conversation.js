@@ -15,6 +15,22 @@ const conversationModel = mongoose.Schema(
             trim: true,
             ref: "Chat",
         },
+        attachments: [
+            {
+                fileName: {
+                    type: String,
+                    required: true,
+                },
+                fileType: {
+                    type: String,
+                    required: true,
+                },
+                fileUrl: {
+                    type: String,
+                    required: true,
+                },
+            },
+        ],
     },
     { timestamps: true }
 );

@@ -10,6 +10,8 @@ const bodyParser = require('body-parser');
 
 // Internal imports
 const userRoute = require("./Routes/userRoute");
+const chatRoute = require("./Routes/chatRoutes");
+const conversationRoute = require("./Routes/conversationRoutes");
 
 dotenv.config();
 
@@ -43,6 +45,8 @@ connectDB();
 app.use("/signup", userRoute);
 app.use("/login", userRoute);
 app.use('/', userRoute);
+app.use("/chat", chatRoute);
+app.use("/conversation", conversationRoute);
 
 server.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);
