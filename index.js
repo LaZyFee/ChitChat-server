@@ -46,7 +46,7 @@ app.use("/signup", userRoute);
 app.use("/login", userRoute);
 app.use('/', userRoute);
 app.use("/chat", chatRoute);
-app.use("/conversation", conversationRoute);
+app.use("/", conversationRoute);
 
 server.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);
