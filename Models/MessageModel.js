@@ -5,33 +5,21 @@ const messageModel = mongoose.Schema(
         sender: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
+            required: true,
+        },
+        content: { type: String, trim: true },
+        chat: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Chat",
+            required: true,
         },
         receiver: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
         },
-        chat: {
-            type: String,
-            ref: "Chat",
-        },
-        attachments: [
-            {
-                fileName: {
-                    type: String,
-                    required: true,
-                },
-                fileType: {
-                    type: String,
-                    required: true,
-                },
-                fileUrl: {
-                    type: String,
-                    required: true,
-                },
-            },
-        ],
     },
     { timestamps: true }
 );
-const Message = mongoose.model("Conversation", messageModel);
+
+const Message = mongoose.model("Message", messageModel);
 module.exports = Message

@@ -26,6 +26,7 @@ const sendMessage = async (req, res) => {
 
         // Validate request data
         if (!content || !chatId) {
+            console.log('Invalid data:', req.body);
             return res.status(400).json({ error: "Invalid data passed into request" });
         }
 
@@ -36,33 +37,32 @@ const sendMessage = async (req, res) => {
             chat: chatId,
         };
 
-        try {
-            // Save the message in the database
-            let message = await MessageModel.create(newMessage);
+        // Save the message in the database
+        let message = await MessageModel.create(newMessage);
 
-            // Populate related fields
-            message = await message.populate("sender", "name");
-            message = await message.populate("chat");
-            message = await message.populate("receiver");
+        // Populate related fields
+        message = await message.populate("sender", "name");
+        message = await message.populate("chat");
+        message = await message.populate("receiver");
 
-            // Populate users in the chat
-            message = await UserModel.populate(message, {
-                path: "chat.users",
-                select: "name email",
-            });
+        // Populate users in the chat
+        message = await UserModel.populate(message, {
+            path: "chat.users",
+            select: "name email",
+        });
 
-            // Update the latest message in the chat
-            await ChatModel.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
+        // Update the latest message in the chat
+        await ChatModel.findByIdAndUpdate(chatId, { latestMessage: message });
 
-            // Send the response with the populated message
-            res.status(200).json(message);
-        } catch (error) {
-            res.status(400).json({ error: error.message });
-        }
+        // Send the response with the populated message
+        res.status(200).json(message);
     } catch (error) {
+        console.error("Error in sendMessage:", error);
         res.status(500).json({ error: error.message });
     }
 };
+
+
 
 
 module.exports = { allMessages, sendMessage };

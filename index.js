@@ -45,7 +45,7 @@ connectDB();
 app.use("/signup", userRoute);
 app.use("/login", userRoute);
 app.use('/', userRoute);
-app.use("/chat", chatRoute);
+app.use("/chat", messageRoute);
 app.use("/", messageRoute);
 
 server.listen(PORT, () => {
