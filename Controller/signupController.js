@@ -1,5 +1,4 @@
-// Controller/signupController.js
-const User = require("../Models/Users");
+const UserModel = require("../Models/UserModel");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -13,7 +12,7 @@ const signUp = async (req, res) => {
         }
 
         // Check if email or name already exists
-        const existingUser = await User.findOne({ $or: [{ email }, { name }] });
+        const existingUser = await UserModel.findOne({ $or: [{ email }, { name }] });
         if (existingUser) {
             if (existingUser.email === email) {
                 return res.status(400).json({ message: "Email is already taken" });
@@ -23,20 +22,30 @@ const signUp = async (req, res) => {
             }
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        // Check if image is provided and validate its format
+        if (image) {
+            const contentType = image.split(";")[0].split(":")[1];
+            if (!['image/png', 'image/jpeg', 'image/webp'].includes(contentType)) {
+                return res.status(400).json({ message: "Unsupported image format" });
+            }
+        }
+
+        // Generate salt and hash the password with salt
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
         // Prepare the user object
-        const user = new User({
+        const user = new UserModel({
             name,
             email,
             mobile,
             password: hashedPassword,
             profilePicture: image
                 ? {
-                    data: Buffer.from(image.split(",")[1], 'base64'),  // Remove base64 header
-                    contentType: 'image/png', // Adjust based on image type
+                    data: Buffer.from(image.split(",")[1], 'base64'),  // Extract base64 data
+                    contentType: image.split(";")[0].split(":")[1],    // Dynamically extract content type
                 }
-                : undefined, // Set profilePicture only if image is provided
+                : undefined,
         });
 
         // Save user to database
@@ -53,11 +62,12 @@ const signUp = async (req, res) => {
             token,
             user: {
                 name: user.name,
-                profilePicture: user.profilePicture ? `data:${user.profilePicture.contentType};base64,${user.profilePicture.data.toString('base64')}` : null,
+                profilePicture: user.profilePicture
+                    ? `data:${user.profilePicture.contentType};base64,${user.profilePicture.data.toString('base64')}`
+                    : null,
             },
         });
-    }
-    catch (err) {
+    } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };

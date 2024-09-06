@@ -1,19 +1,19 @@
-const Conversation = require("../Models/Conversation");
-const Chat = require("../Models/Chat");
-const User = require("../Models/Users");
+const MessageModel = require("../Models/MessageModel");
+const UserModel = require("../Models/UserModel");
+const ChatModel = require("../Models/ChatModel");
 
-const allConversations = async (req, res) => {
+const allMessages = async (req, res) => {
     try {
-        const conversations = await Conversation.find({ chat: req.params.chatId })
+        const message = await MessageModel.find({ chat: req.params.chatId })
             .populate("sender", "name email")
             .populate("receiver", "name email") // Ensure receiver is a valid reference in the schema
             .populate("chat");
 
-        if (conversations.length === 0) {
+        if (message.length === 0) {
             return res.status(404).json({ message: "No conversations found." });
         }
 
-        res.status(200).json(conversations);
+        res.status(200).json(message);
     } catch (error) {
         res.status(500).send({ error: error.message });
     }
@@ -38,21 +38,21 @@ const sendMessage = async (req, res) => {
 
         try {
             // Save the message in the database
-            let message = await Conversation.create(newMessage);
+            let message = await MessageModel.create(newMessage);
 
             // Populate related fields
-            message = await message.populate("sender", "name email");
+            message = await message.populate("sender", "name");
             message = await message.populate("chat");
-            message = await message.populate("receiver", "name email"); // Ensure receiver is a valid reference in the schema
+            message = await message.populate("receiver");
 
             // Populate users in the chat
-            message = await User.populate(message, {
+            message = await UserModel.populate(message, {
                 path: "chat.users",
                 select: "name email",
             });
 
             // Update the latest message in the chat
-            await Chat.findByIdAndUpdate(chatId, { latestMessage: message });
+            await ChatModel.findByIdAndUpdate(req.body.chatId, { latestMessage: message });
 
             // Send the response with the populated message
             res.status(200).json(message);
@@ -65,4 +65,4 @@ const sendMessage = async (req, res) => {
 };
 
 
-module.exports = { allConversations, sendMessage };
+module.exports = { allMessages, sendMessage };

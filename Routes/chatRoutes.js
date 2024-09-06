@@ -5,12 +5,13 @@ const router = express.Router();
 const {
     accessChat,
     fetchChats,
-    createGroupChat,
+} = require("../Controller/chatController");
+
+const { createGroupChat,
     fetchGroupChats,
     groupExit,
     groupAdd,
-    addSelfToGroup,
-} = require("../Controller/chatController");
+    addSelfToGroup } = require("../Controller/groupChatController");
 
 router.route("/").post(protect, accessChat);
 router.route("/").get(protect, fetchChats);

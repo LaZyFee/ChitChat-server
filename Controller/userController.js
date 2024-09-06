@@ -1,4 +1,4 @@
-const User = require("../Models/Users");
+const UserModel = require("../Models/UserModel");
 
 
 const allUsers = async (req, res) => {
@@ -11,7 +11,7 @@ const allUsers = async (req, res) => {
         }
         : {};
 
-    const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+    const users = await UserModel.find(keyword).find({ _id: { $ne: req.user._id } });
     res.send(users);
 }
 
