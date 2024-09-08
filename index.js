@@ -42,11 +42,11 @@ const connectDB = async () => {
 
 connectDB();
 
-app.use("/signup", userRoute);
-app.use("/login", userRoute);
-app.use('/', userRoute);
-app.use("/chat", messageRoute);
-app.use("/", messageRoute);
+app.use(['/signup', '/login', '/'], userRoute);
+app.use(['/chat', '/'], messageRoute);
+app.use('/messages', messageRoute);
+
+
 
 server.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`);

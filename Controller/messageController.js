@@ -2,11 +2,28 @@ const MessageModel = require("../Models/MessageModel");
 const UserModel = require("../Models/UserModel");
 const ChatModel = require("../Models/ChatModel");
 
+
+const allMessagesForAllUsers = async (req, res) => {
+    try {
+        const messages = await MessageModel.find({})
+            .populate("sender", "name email")
+            .populate("receiver", "name email")
+            .populate("chat");
+
+        if (messages.length === 0) {
+            return res.status(404).json({ message: "No messages found." });
+        }
+
+        res.status(200).json(messages);
+    } catch (error) {
+        res.status(500).send({ error: error.message });
+    }
+};
 const allMessages = async (req, res) => {
     try {
         const message = await MessageModel.find({ chat: req.params.chatId })
             .populate("sender", "name email")
-            .populate("receiver", "name email") // Ensure receiver is a valid reference in the schema
+            .populate("receiver", "name email")
             .populate("chat");
 
         if (message.length === 0) {
@@ -22,10 +39,11 @@ const allMessages = async (req, res) => {
 
 const sendMessage = async (req, res) => {
     try {
-        const { content, chatId } = req.body;
+        const { content, chatId, receiverId } = req.body;
+        // Log the received data
+        console.log('Received data:', req.body);
 
-        // Validate request data
-        if (!content || !chatId) {
+        if (!content || !chatId || !receiverId) {
             console.log('Invalid data:', req.body);
             return res.status(400).json({ error: "Invalid data passed into request" });
         }
@@ -35,6 +53,7 @@ const sendMessage = async (req, res) => {
             sender: req.user._id,
             content: content,
             chat: chatId,
+            receiver: receiverId, // Set receiver ID
         };
 
         // Save the message in the database
@@ -43,7 +62,7 @@ const sendMessage = async (req, res) => {
         // Populate related fields
         message = await message.populate("sender", "name");
         message = await message.populate("chat");
-        message = await message.populate("receiver");
+        message = await message.populate("receiver", "name"); // Populate receiver
 
         // Populate users in the chat
         message = await UserModel.populate(message, {
@@ -65,4 +84,4 @@ const sendMessage = async (req, res) => {
 
 
 
-module.exports = { allMessages, sendMessage };
+module.exports = { allMessagesForAllUsers, allMessages, sendMessage };
