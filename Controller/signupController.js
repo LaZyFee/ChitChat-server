@@ -22,17 +22,7 @@ const signUp = async (req, res) => {
             }
         }
 
-        // Check if image is provided and validate its format
-        if (image) {
-            const contentType = image.split(";")[0].split(":")[1];
-            if (!['image/png', 'image/jpeg', 'image/webp'].includes(contentType)) {
-                return res.status(400).json({ message: "Unsupported image format" });
-            }
-        }
-
-        // Generate salt and hash the password with salt
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // Prepare the user object
         const user = new UserModel({
@@ -42,32 +32,33 @@ const signUp = async (req, res) => {
             password: hashedPassword,
             profilePicture: image
                 ? {
-                    data: Buffer.from(image.split(",")[1], 'base64'),  // Extract base64 data
-                    contentType: image.split(";")[0].split(":")[1],    // Dynamically extract content type
+                    data: Buffer.from(image.split(",")[1], 'base64'),  // Remove base64 header
+                    contentType: 'image/png', // Adjust based on image type
                 }
-                : undefined,
+                : undefined, // Set profilePicture only if image is provided
         });
 
         // Save user to database
         await user.save();
-
         // Create JWT
         const token = jwt.sign(
             { id: user._id, name: user.name, email: user.email }, process.env.JWT_SECRET, { expiresIn: '30d' }
         );
-
         // Respond with success message and token
         res.status(201).json({
             message: "User created successfully",
             token,
             user: {
+                _id: user._id,
                 name: user.name,
                 profilePicture: user.profilePicture
                     ? `data:${user.profilePicture.contentType};base64,${user.profilePicture.data.toString('base64')}`
                     : null,
             },
         });
-    } catch (err) {
+
+    }
+    catch (err) {
         res.status(500).json({ error: err.message });
     }
 };

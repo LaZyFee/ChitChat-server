@@ -40,8 +40,7 @@ const allMessages = async (req, res) => {
 const sendMessage = async (req, res) => {
     try {
         const { content, chatId, receiverId } = req.body;
-        // Log the received data
-        console.log('Received data:', req.body);
+
 
         if (!content || !chatId || !receiverId) {
             console.log('Invalid data:', req.body);

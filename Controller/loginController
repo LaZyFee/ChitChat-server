@@ -25,12 +25,14 @@ const login = async (req, res) => {
             message: "Login successful",
             token,
             user: {
+                _id: user._id,
                 name: user.name,
                 profilePicture: user.profilePicture
                     ? `data:${user.profilePicture.contentType};base64,${user.profilePicture.data.toString('base64')}`
                     : null,
             }
         });
+
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

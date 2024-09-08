@@ -29,7 +29,8 @@ global.io = io;
 app.locals.moment = moment;
 
 // Database connection
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.9e7m0jr.mongodb.net/ChitChat?retryWrites=true&w=majority&appName=Cluster0`;
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.9e7m0jr.mongodb.net/ChitChat?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = process.env.MONGO_CONNECTION_STRING;
 
 const connectDB = async () => {
     try {
@@ -42,8 +43,11 @@ const connectDB = async () => {
 
 connectDB();
 
-app.use(['/signup', '/login', '/'], userRoute);
-app.use(['/chat', '/'], messageRoute);
+app.use("/signup", userRoute);
+app.use("/login", userRoute);
+app.use('/', userRoute);
+app.use("/chat", messageRoute);
+app.use("/", messageRoute);
 app.use('/messages', messageRoute);
 
 
