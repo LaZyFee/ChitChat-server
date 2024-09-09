@@ -56,29 +56,17 @@ io.on('connection', (socket) => {
     // New message event
     socket.on('new message', (newMessageStatus) => {
         const chat = newMessageStatus.chat;
-
-        if (!chat) {
-            console.log("No chat object in newMessageStatus");
+        if (!chat || !chat.users || !Array.isArray(chat.users) || chat.users.length === 0) {
+            console.log("Invalid chat object");
             return;
         }
-
-        if (!chat.users) {
-            console.log("Chat.users not defined");
-            return;
-        }
-
-        if (!Array.isArray(chat.users) || chat.users.length === 0) {
-            console.log("Chat.users is not an array or is empty");
-            return;
-        }
-
         chat.users.forEach((user) => {
-            if (user._id == newMessageStatus.sender._id) return;
-
-            // Emit the message received event to all users in the chat except the sender
-            socket.to(user._id).emit('message received', newMessageStatus);
+            if (user._id !== newMessageStatus.sender._id) {
+                socket.to(user._id).emit('message received', newMessageStatus);
+            }
         });
     });
+
 
     // Disconnect event
     socket.on('disconnect', () => {
