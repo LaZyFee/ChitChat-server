@@ -32,28 +32,64 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 global.io = io;
 app.locals.moment = moment;
 
+const onlineUsers = new Map();
+
 io.on('connection', (socket) => {
     console.log('socket.io connection established');
+
+    // Setup event
     socket.on('setup', (user) => {
+        onlineUsers.set(user._id, socket.id); // Track user as online
         socket.join(user._id);
         socket.emit('connected');
+
+        // Broadcast online status to other users
+        socket.broadcast.emit('user online', { userId: user._id, online: true });
     });
 
+    // Join chat event
     socket.on('join chat', (room) => {
         socket.join(room);
         console.log('User Joined Room: ' + room);
-    })
-    socket.on("new message", (newMessageStatus) => {
-        let chat = newMessageStatus.chat;
+    });
 
-        if (!chat.users) return console.log("Chat.users not defined");
+    // New message event
+    socket.on('new message', (newMessageStatus) => {
+        const chat = newMessageStatus.chat;
+
+        if (!chat) {
+            console.log("No chat object in newMessageStatus");
+            return;
+        }
+
+        if (!chat.users) {
+            console.log("Chat.users not defined");
+            return;
+        }
+
+        if (!Array.isArray(chat.users) || chat.users.length === 0) {
+            console.log("Chat.users is not an array or is empty");
+            return;
+        }
 
         chat.users.forEach((user) => {
             if (user._id == newMessageStatus.sender._id) return;
-            socket.in(user._id).emit("message received", newMessageStatus);
+
+            // Emit the message received event to all users in the chat except the sender
+            socket.to(user._id).emit('message received', newMessageStatus);
         });
-    })
+    });
+
+    // Disconnect event
+    socket.on('disconnect', () => {
+        const userId = [...onlineUsers.entries()].find(([key, value]) => value === socket.id)?.[0];
+        if (userId) {
+            onlineUsers.delete(userId); // Remove from online map
+            io.emit('user offline', { userId, online: false }); // Broadcast offline status
+        }
+    });
 });
+
 
 
 
