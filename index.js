@@ -17,8 +17,12 @@ dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-const io = require("socket.io")(server);
-const PORT = process.env.PORT || 3000;
+const io = require("socket.io")(server, {
+    cors: {
+        origin: '*',
+    }
+});
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -27,6 +31,35 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 global.io = io;
 app.locals.moment = moment;
+
+io.on('connection', (socket) => {
+    console.log('socket.io connection established');
+    socket.on('setup', (user) => {
+        socket.join(user._id);
+        socket.emit('connected');
+    });
+
+    socket.on('join chat', (room) => {
+        socket.join(room);
+        console.log('User Joined Room: ' + room);
+    })
+    socket.on("new message", (newMessageStatus) => {
+        let chat = newMessageStatus.chat;
+
+        if (!chat.users) return console.log("Chat.users not defined");
+
+        chat.users.forEach((user) => {
+            if (user._id == newMessageStatus.sender._id) return;
+            socket.in(user._id).emit("message received", newMessageStatus);
+        });
+    })
+});
+
+
+
+
+
+
 
 // Database connection
 // const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.9e7m0jr.mongodb.net/ChitChat?retryWrites=true&w=majority&appName=Cluster0`;
