@@ -51,10 +51,12 @@ const signUp = async (req, res) => {
             user: {
                 _id: user._id,
                 name: user.name,
+                email: user.email,
+                mobile: user.mobile,
                 profilePicture: user.profilePicture
                     ? `data:${user.profilePicture.contentType};base64,${user.profilePicture.data.toString('base64')}`
                     : null,
-            },
+            }
         });
 
     }
