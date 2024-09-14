@@ -102,6 +102,7 @@ connectDB();
 
 app.use("/signup", userRoute);
 app.use("/login", userRoute);
+app.use("/logout", userRoute);
 app.use('/', userRoute);
 app.use("/chat", messageRoute);
 app.use("/", messageRoute);
