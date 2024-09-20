@@ -7,21 +7,18 @@ const messageModel = mongoose.Schema(
             ref: "User",
             required: true,
         },
-        content: { type: String, trim: true },
-        chat: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Chat",
-            required: true,
-        },
         receiver: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
             required: true,
         },
-        isRead: {
-            type: Boolean,
-            default: false,
-        },
+        chat: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Chat",
+            }
+        ],
+
     },
     { timestamps: true }
 );

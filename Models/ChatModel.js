@@ -1,27 +1,33 @@
 const mongoose = require("mongoose");
 
-const chatModel = mongoose.Schema(
+const chatModel = mongoose.Schema({
 
-    {
-        chatName: {
-            type: String,
-            trim: true,
-        },
-        isGroupChat: {
-            type: Boolean,
-            default: false,
-        },
-        users: [
-            {
-                type: mongoose.Schema.Types.ObjectId,
-                ref: "User",
-            },
-        ],
-        latestMessage: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Message",
-        }
+    content: {
+        type: String,
+        default: "",
+        trim: true
     },
+    imageUrl: {
+        type: String,
+        default: ""
+    },
+    videoUrl: {
+        type: String,
+        default: ""
+    },
+    audioUrl: {
+        type: String,
+        default: ""
+    },
+    pdfUrl: {
+        type: String,
+        default: ""
+    },
+    fileType: {
+        type: String,
+        default: ""
+    },
+},
     {
         timestamps: true,
     }
