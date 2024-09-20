@@ -1,6 +1,6 @@
-import UserModel from "../Models/UserModel";
+const UserModel = require("../Models/UserModel");
 
-export const updateUserDetails = async (req, res) => {
+const updateUserDetails = async (req, res) => {
     try {
         const { name, profile_pic } = req.body;
 
@@ -28,4 +28,9 @@ export const updateUserDetails = async (req, res) => {
             message: error.message
         });
     }
+};
+
+// Exporting the function in CommonJS style
+module.exports = {
+    updateUserDetails
 };
