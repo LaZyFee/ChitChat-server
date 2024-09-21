@@ -7,9 +7,11 @@ const { protect } = require("../Middlewares/authenticateToken");
 const { allUsers } = require("../Controller/userController");
 const { updateUserDetails } = require("../Controller/updateUser");
 const { searchUSer } = require("../Controller/searchUser");
+const multer = require('multer');
+const storage = multer.memoryStorage(); // Store the file in memory temporarily
+const upload = multer({ storage });
 
-
-// Routes for signup and login
+// Routes for signup and login  
 router.post("/signup", signupController.signUp);
 router.post("/login", loginController.login);
 
@@ -17,7 +19,7 @@ router.post("/login", loginController.login);
 router.get("/users", protect, allUsers);
 
 // Protected route for updating user details
-router.put("/update-user", protect, updateUserDetails);
+router.put('/update-user', protect, upload.single('profile_pic'), updateUserDetails);
 
 //search an user
 router.post("/search-user", protect, searchUSer);
